@@ -136,7 +136,6 @@ def pin_vm_threads(vm, node):
 def check_driver_verifier(session, driver, timeout=300):
     """
     Check driver verifier status
-    : param session: VM session
     : param driver: The driver need to query
     : param timeout: Timeout in seconds
     : return: driver verifier status
@@ -148,15 +147,15 @@ def check_driver_verifier(session, driver, timeout=300):
 
 
 @error_context.context_aware
-def setup_win_driver_verifier(session, driver, vm, timeout=300):
+def setup_win_driver_verifier(driver, vm, timeout=300):
     """
     Enable driver verifier for windows guest.
 
-    :param session: VM session.
     :param driver: The driver which needs enable the verifier.
     :param vm: VM object.
     :param timeout: Timeout in seconds.
     """
+    session = vm.wait_for_login(timeout=timeout)
     verifier_status = check_driver_verifier(session, driver)[1]
     if not verifier_status:
         error_context.context("Enable %s driver verifier" % driver,
@@ -173,13 +172,14 @@ def setup_win_driver_verifier(session, driver, vm, timeout=300):
     logging.info("%s verifier is enabled already" % driver)
 
 
-def clear_win_driver_verifier(session, driver, vm, timeout=300):
+def clear_win_driver_verifier(driver, vm, timeout=300):
     """
     Clear the driver verifier in windows guest.
 
     :param session: VM session.
     :param timeout: Timeout in seconds.
     """
+    session = vm.wait_for_login(timeout=timeout)
     verifier_status = check_driver_verifier(session, driver)[1]
     if verifier_status:
         logging.info("Clear driver verifier")
